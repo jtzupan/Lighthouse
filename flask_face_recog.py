@@ -1,8 +1,8 @@
-import scipy.misc
-from scipy.misc import imread as r
+from scipy.misc import imread
 import numpy as np
 import dlib
 import sys
+import glob
 
 # load the models -- ??? PRETRAINED ???
 face_recognition_model_loc = "./Models/dlib_face_recognition_resnet_model_v1.dat"
@@ -67,10 +67,11 @@ def load_image_file(filename, mode='RGB'):
     Loads an image file (.jpg, .png, etc) into a numpy array
 
     :param filename: image file to load
-    :param mode: format to convert the image to. Only 'RGB' (8-bit RGB, 3 channels) and 'L' (black and white) are supported.
+    :param mode: format to convert the image to. Only 'RGB' (8-bit RGB, 3 channels) and 'L' (black and white)
+        are supported.
     :return: image contents as numpy array
     """
-    return scipy.misc.imread(filename, mode=mode)
+    return imread(filename, mode=mode)
 
 
 def _raw_face_locations(img, number_of_times_to_upsample=1):
@@ -78,7 +79,8 @@ def _raw_face_locations(img, number_of_times_to_upsample=1):
     Returns an array of bounding boxes of human faces in a image
 
     :param img: An image (as a numpy array)
-    :param number_of_times_to_upsample: How many times to upsample the image looking for faces. Higher numbers find smaller faces.
+    :param number_of_times_to_upsample: How many times to upsample the image looking for faces. Higher numbers find
+        smaller faces.
     :return: A list of dlib 'rect' objects of found face locations
     """
     return face_detector(img, number_of_times_to_upsample)
@@ -89,10 +91,12 @@ def face_locations(img, number_of_times_to_upsample=1):
     Returns an array of bounding boxes of human faces in a image
 
     :param img: An image (as a numpy array)
-    :param number_of_times_to_upsample: How many times to upsample the image looking for faces. Higher numbers find smaller faces.
+    :param number_of_times_to_upsample: How many times to upsample the image looking for faces. Higher numbers find
+        smaller faces.
     :return: A list of tuples of found face locations in css (top, right, bottom, left) order
     """
-    return [_trim_css_to_bounds(_rect_to_css(face), img.shape) for face in _raw_face_locations(img, number_of_times_to_upsample)]
+    return [_trim_css_to_bounds(_rect_to_css(face), img.shape)
+            for face in _raw_face_locations(img, number_of_times_to_upsample)]
 
 
 def _raw_face_landmarks(face_image, face_locations=None):
@@ -135,12 +139,14 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
 
     :param face_image: The image that contains one or more faces
     :param known_face_locations: Optional - the bounding boxes of each face if you already know them.
-    :param num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate, but slower (i.e. 100 is 100x slower)
+    :param num_jitters: How many times to re-sample the face when calculating encoding. Higher is more accurate,
+        but slower (i.e. 100 is 100x slower)
     :return: A list of 128-dimentional face encodings (one for each face in the image)
     """
     raw_landmarks = _raw_face_landmarks(face_image, known_face_locations)
 
-    return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters)) for raw_landmark_set in raw_landmarks]
+    return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters))
+            for raw_landmark_set in raw_landmarks]
 
 
 def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
@@ -149,82 +155,55 @@ def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
 
     :param known_face_encodings: A list of known face encodings
     :param face_encoding_to_check: A single face encoding to compare against the list
-    :param tolerance: How much distance between faces to consider it a match. Lower is more strict. 0.6 is typical best performance.
+    :param tolerance: How much distance between faces to consider it a match. Lower is more strict. 0.6 is typical
+        best performance.
     :return: A list of True/False values indicating which known_face_encodings match the face encoding to check
     """
     return list(face_distance(known_face_encodings, face_encoding_to_check) <= tolerance)
 
 
-def main(raw_image=None):
+# main function
+def identify(raw_image=None):
 
     # read the test_image as an argument
     if raw_image is None:
-        test_image = r(sys.argv[1], mode='RGB')
-
+        test_image = imread(sys.argv[1], mode='RGB')
         print("Image: {}".format(sys.argv[1]))
-    else:
-        test_image = r(raw_image, mode='RGB')
 
-    # 1. obtain the face encodings
+    else:
+        # read the raw image
+        test_image = imread(raw_image, mode='RGB')
+
+    # 1. obtain the face encodings from the test image
+    # one face encoding for every face found in the image
     test_image_face_encodings = face_encodings(test_image)
     print("Found {} faces".format(len(test_image_face_encodings)))
+    print("# # # # # # #")
 
-    # data entries are going here
-    names = [
-        "Dan Sharp",
-        "James Arnoldi",
-        "Jason Charles",
-        "John Simmons",
-        "Alan Spohn",
-        "Parul Luthra",
-        "Mike Stedman",
-        "Suman Biswas",
-        "Tyler Zupan"
-    ]
+    # 2. Obtain the faces, names and encodings from the database
+    # read the photos and names from a directory
+    names = []
+    encodings = []
+    for filename in glob.glob("./Mugshots/*.jpg"):
+        names.append(filename[11:-4])
+        encodings.append(face_encodings(imread(filename, mode='RGB'))[0])
 
-    # read the known images - data warehouse
-    parul = r("./Mugshots/Parul Luthra.jpg", mode='RGB')
-    alan = r("./Mugshots/Alan Spohn.jpg", mode='RGB')
-    dan = r("./Mugshots/Dan Sharp.jpg", mode='RGB')
-    james = r("./Mugshots/James Arnoldi.jpg", mode='RGB')
-    jason = r("./Mugshots/Jason Charles.jpg", mode='RGB')
-    john = r("./Mugshots/John Simmons.jpg", mode='RGB')
-    mike = r("./Mugshots/Mike Stedman.jpg", mode='RGB')
-    suman = r("./Mugshots/Suman Biswas.jpg", mode='RGB')
-    tyler = r("./Mugshots/Tyler Zupan.jpg", mode='RGB')
-
-    # encode the images
-    parul_enc = face_encodings(parul)[0]
-    alan_enc = face_encodings(alan)[0]
-    dan_enc = face_encodings(dan)[0]
-    james_enc = face_encodings(james)[0]
-    jason_enc = face_encodings(jason)[0]
-    john_enc = face_encodings(john)[0]
-    mike_enc = face_encodings(mike)[0]
-    suman_enc = face_encodings(suman)[0]
-    tyler_enc = face_encodings(tyler)[0]
-
-    # database of encoded mugshots
-    known_images = [
-        dan_enc,
-        james_enc,
-        jason_enc,
-        john_enc,
-        alan_enc,
-        parul_enc,
-        mike_enc,
-        suman_enc,
-        tyler_enc
-    ]
+    # 3. Compare every face from the test image to the database
+    # and report to the console
+    known_images = encodings
 
     # for every face found on the photo, run the comparison
     for i, enc in enumerate(test_image_face_encodings):
 
         results = compare_faces(known_images, enc)
+        print(results)
 
         if True in results:
-            print("Match Found at index: {}".format(i))
-            print(names[results.index(True)])
+            print("Match found at index: {}".format(i))
+            print("-> {}".format(names[results.index(True)]))
+            print("- - - - - - -")
+
+    # TODO: Figure out the indexing problems on the "Match found"
 
     return 0
 
