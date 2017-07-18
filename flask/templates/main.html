@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -9,15 +10,18 @@
 
     <title>Lighthouse</title>
 
-    <!-- Bootstrap core CSS -->
-    <link href="../../dist/css/bootstrap.min.css" rel="stylesheet">
+    {% include 'head_css.html' %}
 
-    <!-- Custom styles for this template -->
-    <link href="jumbotron.css" rel="stylesheet">
   </head>
 
   <body>
 
-        <a href="{{ url_for('upload_file') }}">Click Here to Upload Photo</a></p>
+    {% include 'navbar.html' %}
+
+    {% block content %}
+    {% endblock %}
+
+
   </body>
 </html>
+

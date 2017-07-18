@@ -14,7 +14,7 @@ app = Flask(__name__)
 
 @app.route('/')
 def home():
-    return render_template('home.html')
+    return render_template('home_page.html')
 
 def allowed_file(filename):
     return '.' in filename and \
@@ -37,15 +37,8 @@ def upload_file():
             filename = secure_filename(file.filename)
             file.save(os.path.join('.', 'photo_uploads', filename))
             return redirect(url_for('thank_you'))
-    return '''
-    <!doctype html>
-    <title>Upload new File</title>
-    <h1>Upload new File</h1>
-    <form method=post enctype=multipart/form-data>
-      <p><input type=file name=file>
-         <input type=submit value=Upload>
-    </form>
-    '''
+    return render_template('face_recog.html')
+
 @app.route('/thank_you/')
 def thank_you():
     return render_template('thank_you.html')
