@@ -1,6 +1,4 @@
-
-
-from flask import Flask, render_template, request, redirect, url_for
+from flask import Flask, render_template, request, redirect, url_for, flash
 import os
 from werkzeug.utils import secure_filename
 
@@ -9,16 +7,18 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-
 app = Flask(__name__)
+
 
 @app.route('/')
 def home():
     return render_template('home_page.html')
 
+
 def allowed_file(filename):
     return '.' in filename and \
            filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
 
 @app.route('/upload_file/', methods=['GET', 'POST'])
 def upload_file():
@@ -39,15 +39,10 @@ def upload_file():
             return redirect(url_for('thank_you'))
     return render_template('face_recog.html')
 
+
 @app.route('/thank_you/')
 def thank_you():
     return render_template('thank_you.html')
-
-
-
-
-
-
 
 if __name__ == '__main__':
     app.run(debug=True)
