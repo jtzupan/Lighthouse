@@ -7,7 +7,6 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app = Flask(__name__)
 app.config['SECRET_KEY'] = 'super-secret'
 
 @app.route('/')
