@@ -4,6 +4,8 @@ import dlib
 import sys
 import glob
 
+TOLERANCE = 0.5
+
 # load the models -- ??? PRETRAINED ???
 face_recognition_model_loc = "./Models/dlib_face_recognition_resnet_model_v1.dat"
 face_encoder = dlib.face_recognition_model_v1(face_recognition_model_loc)
@@ -149,7 +151,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             for raw_landmark_set in raw_landmarks]
 
 
-def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=0.6):
+def compare_faces(known_face_encodings, face_encoding_to_check, tolerance=TOLERANCE):
     """
     Compare a list of face encodings against a candidate encoding to see if they match.
 
@@ -192,20 +194,22 @@ def identify(raw_image=None):
     # and report to the console
     known_images = encodings
 
+    id_people = []
     # for every face found on the photo, run the comparison
     for i, enc in enumerate(test_image_face_encodings):
 
         results = compare_faces(known_images, enc)
-        print(results)
+        # print(results)
 
         if True in results:
-            print("Match found at index: {}".format(i))
-            print("-> {}".format(names[results.index(True)]))
-            print("- - - - - - -")
+            # print("Match found at index: {}".format(i))
+            # print("-> {}".format(names[results.index(True)]))
+            # print("- - - - - - -")
+            id_people.append(names[results.index(True)])
 
     # TODO: Figure out the indexing problems on the "Match found"
 
-    return 0
+    return id_people
 
 
 

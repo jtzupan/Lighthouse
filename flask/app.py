@@ -1,6 +1,7 @@
-from flask import Flask, render_template, request, redirect, url_for, flash
 import os
+from flask import Flask, render_template, request, redirect, flash
 from werkzeug.utils import secure_filename
+from flask_face_recog import identify
 
 UPLOAD_FOLDER = '/photo_uploads/'
 ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
@@ -8,6 +9,7 @@ ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SECRET_KEY'] = 'super-secret'
+
 
 @app.route('/')
 def home():
@@ -34,8 +36,13 @@ def upload_file():
             return redirect(request.url)
         if file and allowed_file(file.filename):
             filename = secure_filename(file.filename)
-            file.save(os.path.join('.', 'photo_uploads', filename))
-            return redirect(url_for('thank_you'))
+
+            # make the path for the photo
+            path = os.path.join('.', 'photo_uploads', filename)
+            file.save(path)
+            flash(identify(path))
+
+            # return redirect(url_for('thank_you'))
     return render_template('face_recog.html')
 
 
