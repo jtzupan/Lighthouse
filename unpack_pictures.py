@@ -177,6 +177,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
             for raw_landmark_set in raw_landmarks]
 
 
+# convert the photos to encodings and save to the disk
 names = []
 encodings = []
 for filename in glob.glob("flask/Mugshots/*.jpg"):
