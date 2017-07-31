@@ -207,10 +207,7 @@ def identify(raw_image=None):
             # print("- - - - - - -")
             id_people.append(names[results.index(True)])
 
-    # TODO: Figure out the indexing problems on the "Match found"
-
+    print(id_people)
     return id_people
 
-
-
-
+identify()
