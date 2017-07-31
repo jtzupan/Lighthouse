@@ -1,6 +1,3 @@
-import json
-import urllib.request
-import os
 from scipy.misc import imread
 import dlib
 import numpy as np
@@ -9,6 +6,7 @@ import glob
 # with open('data.json') as file_name:
 #     data = json.load(file_name)
 
+# Sift API
 # for i in range(0, len(data['results'])):
 #     try:
 #         picture_URL = data['results'][i]['officialPictureUrl']
@@ -43,6 +41,7 @@ def face_encodings(face_image, known_face_locations=None, num_jitters=1):
 
     return [np.array(face_encoder.compute_face_descriptor(face_image, raw_landmark_set, num_jitters))
             for raw_landmark_set in raw_landmarks]
+
 
 def _rect_to_css(rect):
     """

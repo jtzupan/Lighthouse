@@ -207,7 +207,8 @@ def identify(raw_image=None):
             # print("- - - - - - -")
             id_people.append(names[results.index(True)])
 
-    print(id_people)
+    for person in id_people:
+        print(person[6:])
     return id_people
 
 identify()
