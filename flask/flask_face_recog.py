@@ -186,9 +186,9 @@ def identify(raw_image=None):
     # read the photos and names from a directory
     names = []
     encodings = []
-    for filename in glob.glob("./Mugshots/*.jpg"):
+    for filename in glob.glob("../encodings/ots/*.npy"):
         names.append(filename[11:-4])
-        encodings.append(face_encodings(imread(filename, mode='RGB'))[0])
+        encodings.append(np.load(file=filename))
 
     # 3. Compare every face from the test image to the database
     # and report to the console
@@ -207,10 +207,8 @@ def identify(raw_image=None):
             # print("- - - - - - -")
             id_people.append(names[results.index(True)])
 
-    # TODO: Figure out the indexing problems on the "Match found"
-
+    for i, person in enumerate(id_people):
+        print(person[6:])
     return id_people
 
-
-
-
+identify()
