@@ -186,7 +186,7 @@ def identify(raw_image=None):
     # read the photos and names from a directory
     names = []
     encodings = []
-    for filename in glob.glob("../encodings/ots/*.npy"):
+    for filename in glob.glob("./encodings/ots/*.npy"):
         names.append(filename[11:-4])
         encodings.append(np.load(file=filename))
 
@@ -209,6 +209,5 @@ def identify(raw_image=None):
 
     for i, person in enumerate(id_people):
         print(person[6:])
-    return id_people
 
-identify()
+    return id_people
